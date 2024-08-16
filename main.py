@@ -8,7 +8,10 @@ pygame.init()
 
 WIDTH = 900
 HEIGHT = 600
+FPS = 60
+
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption('Wall Game')
 clock = pygame.time.Clock()
 font = pygame.font.SysFont('Arial Black', 50)
 end_font = pygame.font.SysFont('Arial White', 90)
@@ -208,7 +211,7 @@ while run:
     else:
         redraw()
 
-    clock.tick(60)
+    clock.tick(FPS)
 
 
 pygame.quit()
