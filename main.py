@@ -66,9 +66,10 @@ mouse_r = 40
 #   |  LEFT WALL       |    GAP    |  RIGHT WALL    |
 #   --------------------           ------------------  wall_y+wall_h
 #   0              wall_x        wall_x+3*mouse_r     WIDTH
+
 wall_w = randint(100, 600)
 wall_y = -50
-wall_h = 20  # COULD DO RANDOM LATE
+wall_h = 20
 wall_speed = 2
 
 # Declare a gap in the wall = 3 * mouse_r
@@ -103,7 +104,7 @@ def redraw():
 
     # score
     text2 = font.render(f'Score: {score}', 1, RED)
-    screen.blit(text2, (WIDTH - 200, 10))
+    screen.blit(text2, (10, 70))
     pygame.display.update()
 
 
@@ -135,24 +136,26 @@ while run:
     if ball_y < 0 + ball_r or ball_y > HEIGHT - ball_r:
         speed_y *= -1
 
-    # mouse:
+    # mouse
     if ball_visible:
         mouse_x, mouse_y = pygame.mouse.get_pos()
         mouse_rect = pygame.Rect(mouse_x - mouse_r, mouse_y - mouse_r, mouse_r * 2, mouse_r * 2)
-    gapRect = pygame.Rect(wall_w, wall_y, GAP, wall_h)
-    if pygame.Rect.colliderect(mouse_rect, gapRect) and not pass_gap:
-        score += 1
-        pass_gap = True
 
-    left_rect = pygame.Rect(0, wall_y, wall_w, wall_h)
-    right_rect = pygame.Rect(wall_w + GAP, wall_y, WIDTH - (wall_w + GAP), wall_h)
+        gap_rect = pygame.Rect(wall_w, wall_y, GAP, wall_h)
 
-    if (
-        pygame.Rect.colliderect(mouse_rect, left_rect) or pygame.Rect.colliderect(mouse_rect, right_rect)
-    ) and not pass_wall:
-        score -= 1
-        lives -= 1
-        pass_wall = True
+        if pygame.Rect.colliderect(mouse_rect, gap_rect) and not pass_gap:
+            score += 1
+            pass_gap = True
+
+        left_rect = pygame.Rect(0, wall_y, wall_w, wall_h)
+        right_rect = pygame.Rect(wall_w + GAP, wall_y, WIDTH - (wall_w + GAP), wall_h)
+
+        if (
+            pygame.Rect.colliderect(mouse_rect, left_rect) or pygame.Rect.colliderect(mouse_rect, right_rect)
+        ) and not pass_wall:
+            score -= 1
+            lives -= 1
+            pass_wall = True
 
     # walls
     wall_y += wall_speed
@@ -183,11 +186,13 @@ while run:
         new_mouse_y = randint(mouse_r, HEIGHT // 2)  # Regenerate above half of the screen
         new_mouse_r = randint(20, 50)
 
-    # Regenerate the ball above the screen
-    if mouse_y > HEIGHT:
-        mouse_x, mouse_y, mouse_r, ball_color = new_mouse_x, new_mouse_y, new_mouse_r, ball_color
-        ball_visible = True
-        ball_color = (randint(0, 255), randint(0, 255), randint(0, 255))  # New color for the mouse ball
+        # Regenerate the ball above the screen
+        if mouse_y > HEIGHT:
+            mouse_x, mouse_y, mouse_r = new_mouse_x, new_mouse_y, new_mouse_r
+            ball_visible = True
+
+            # New color for the mouse ball
+            ball_color = (randint(0, 255), randint(0, 255), randint(0, 255))
 
     distance = math.dist((ball_x, ball_y), (mouse_x, mouse_y))
     if distance < ball_r + mouse_r and not collision:
@@ -198,10 +203,12 @@ while run:
 
     if lives <= 0:
         run = False
+        game_over()
+        pygame.time.delay(2000)
+    else:
+        redraw()
 
-    redraw()
     clock.tick(60)
 
-game_over()
-pygame.time.delay(2000)
+
 pygame.quit()
